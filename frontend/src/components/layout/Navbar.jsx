@@ -1,46 +1,50 @@
 import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
+// import { useUser } from "@/hooks/useUser"
 import useUser from "@/hooks/useUser"
 
-export default function Navbar() {
-  const user = useUser()
-  const navigate = useNavigate()
 
-  const handleLogout = () => {
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")
-    navigate("/login")
-  }
+export default function Navbar() {
+  const navigate = useNavigate()
+  const { user, logout } = useUser()
 
   return (
-    <div className="w-full border-b bg-white">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold">
-  UrbanClap
-</Link>
+    <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/70 border-b">
+      <div className="w-full px-8 py-4 flex justify-between items-center">
 
 
-        <div className="flex gap-4 items-center">
-          <Link to="/services">
-            <Button variant="ghost">Services</Button>
+        {/* Logo */}
+        <h1
+          onClick={() => navigate("/")}
+          className="text-xl font-bold cursor-pointer bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
+        >
+          FixMitra
+        </h1>
+
+        {/* Links */}
+        <div className="flex items-center gap-6">
+          <Link to="/services" className="hover:text-indigo-600 transition">
+            Services
           </Link>
 
-          {user ? (
+          {!user && (
             <>
-              <span className="text-sm text-gray-500">
-                {user.role}
-              </span>
-              <Button variant="outline" onClick={handleLogout}>
+              <Link to="/login">Login</Link>
+              <Button size="sm" onClick={() => navigate("/register")}>
+                Register
+              </Button>
+            </>
+          )}
+
+          {user && (
+            <>
+              <Button size="sm" variant="outline" onClick={logout}>
                 Logout
               </Button>
             </>
-          ) : (
-            <Link to="/login">
-              <Button>Login</Button>
-            </Link>
           )}
         </div>
       </div>
-    </div>
+    </nav>
   )
 }

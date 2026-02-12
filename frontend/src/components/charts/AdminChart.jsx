@@ -1,33 +1,3 @@
-// import {
-//   BarChart,
-//   Bar,
-//   XAxis,
-//   YAxis,
-//   Tooltip,
-//   ResponsiveContainer,
-// } from "recharts"
-
-// export default function AdminChart({ data }) {
-//   return (
-//     <div className="bg-white p-6 rounded-2xl shadow">
-//       <h2 className="text-xl font-bold mb-4">
-//         Monthly Bookings
-//       </h2>
-
-//       <ResponsiveContainer width="100%" height={300}>
-//         <BarChart data={data}>
-//           <XAxis dataKey="month" />
-//           <YAxis />
-//           <Tooltip />
-//           <Bar dataKey="bookings" fill="#6366f1" />
-//         </BarChart>
-//       </ResponsiveContainer>
-//     </div>
-//   )
-// }
-
-
-
 import {
   LineChart,
   Line,

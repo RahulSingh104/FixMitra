@@ -15,6 +15,7 @@ import { BrowserRouter } from "react-router-dom"
 import Navbar from "@/components/layout/Navbar"
 import AppRoutes from "@/routes/AppRoutes"
 import { Toaster } from "@/components/ui/toaster"
+import Footer from "@/components/layout/Footer"
 
 function App() {
   return (
@@ -25,6 +26,8 @@ function App() {
       {/* Application Routes */}
       <AppRoutes />
 
+      <Footer />
+      
       {/* Global Toast Notifications */}
       <Toaster />
     </BrowserRouter>
