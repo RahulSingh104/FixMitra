@@ -64,6 +64,7 @@ model Service {
   location    String
   latitude    Float? 
   longitude   Float?
+  image       String?
   createdAt   DateTime @default(now())
 
   providerId  String
