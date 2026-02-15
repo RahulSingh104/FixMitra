@@ -7,6 +7,10 @@ exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "All fields required" });
+    }
+
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -105,7 +109,7 @@ exports.verifyOTP = async (req, res) => {
       return res.status(400).json({ message: "OTP expired" });
     }
 
-    await prisma.user.update({
+    const user = await prisma.user.update({
       where: { email },
       data: { isVerified: true },
     });
@@ -123,8 +127,7 @@ exports.verifyOTP = async (req, res) => {
       token,
       user,
     });
-
-    res.json({ message: "Email verified successfully" });
+    
   } catch (error) {
     res.status(500).json({ message: "OTP verification failed" });
   }

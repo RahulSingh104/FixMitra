@@ -1,41 +1,24 @@
-// const express = require("express");
-// const { verifyEmail } = require("../controllers/auth.controller");
-
-// const router = express.Router();
-
-// // auth routes
-// router.post("/register", register);
-// router.post("/login", login);
-
-// // VERIFY EMAIL ROUTE
-// router.get("/verify/:token", verifyEmail);
-
-// router.get("/test-email", async (req, res) => {
-//   const transporter = require("../config/mail");
-
-//   await transporter.sendMail({
-//     from: process.env.EMAIL_USER,
-//     to: process.env.EMAIL_USER,
-//     subject: "Test Email",
-//     text: "Email is working",
-//   });
-
-//   res.send("Email sent");
-// });
-
-
-// module.exports = router;
-
-
 const express = require("express");
 const {
   register,
   login,
   verifyOTP,
+
 } = require("../controllers/auth.controller");
+const { protect } = require("../middleware/auth.middleware")
 
 const passport = require("passport");
 const router = express.Router();
+
+router.put("/profile", protect, async (req, res) => {
+  const user = await prisma.user.update({
+    where: { id: req.user.id },
+    data: { name: req.body.name },
+  })
+
+  res.json(user)
+})
+
 
 // AUTH ROUTES
 router.post("/register", register);

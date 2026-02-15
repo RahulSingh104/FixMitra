@@ -28,12 +28,14 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   const user = useUser()
 
   if (!token || !user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/login" />
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/" />
   }
+  
+  console.log("ProtectedRoute check:", user?.role)
 
   return children
 }

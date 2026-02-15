@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -15,6 +13,7 @@ export default function AddService() {
   const [categories, setCategories] = useState([])
   const [latitude, setLatitude] = useState(null)
   const [longitude, setLongitude] = useState(null)
+  const [image, setImage] = useState("") 
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -37,6 +36,7 @@ export default function AddService() {
         categoryId,
         latitude,
         longitude,
+        image,
       })
 
       alert("Service Added Successfully 🚀")
@@ -48,7 +48,7 @@ export default function AddService() {
       setCategoryId("")
       setLatitude(null)
       setLongitude(null)
-
+      setImage("")
     } catch (error) {
       console.error("Service creation failed", error)
     } finally {
@@ -99,6 +99,14 @@ export default function AddService() {
               className="w-full border rounded-lg px-4 py-2"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Image URL"
+              className="w-full border rounded-lg px-4 py-2"
+              value={image}
+              onChange={(e) => setImage(e.target.value)}
               required
             />
 

@@ -18,10 +18,13 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+   try {
     await API.post("/auth/register", form)
-
     navigate("/verify", { state: { email: form.email } })
+  } catch (error) {
+    console.log(error.response?.data)
   }
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

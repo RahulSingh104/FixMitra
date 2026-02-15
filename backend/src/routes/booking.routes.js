@@ -1,13 +1,3 @@
-// const router = require("express").Router();
-// const { protect } = require("../middleware/auth.middleware");
-// const bookingController = require("../controllers/booking.controller");
-
-// router.post("/", protect, bookingController.createBooking);
-// router.patch("/:id/status", protect, bookingController.updateBookingStatus);
-
-// module.exports = router;
-
-
 const router = require("express").Router();
 const prisma = require("../prisma/client");
 const { protect, authorize } = require("../middleware/auth.middleware");
@@ -111,6 +101,50 @@ router.put(
     })
 
     res.json(booking)
+  }
+)
+// Provider Stats
+router.get(
+  "/provider/stats",
+  protect,
+  authorize("PROVIDER"),
+  async (req, res) => {
+    try {
+      const providerId = req.user.id
+
+      const services = await prisma.service.findMany({
+        where: { providerId },
+        include: {
+          bookings: true,
+        },
+      })
+
+      let totalBookings = 0
+      let completed = 0
+      let earnings = 0
+
+      services.forEach(service => {
+        totalBookings += service.bookings.length
+
+        service.bookings.forEach(b => {
+          if (b.status === "COMPLETED") {
+            completed++
+            earnings += service.price
+          }
+        })
+      })
+
+      res.json({
+        totalServices: services.length,
+        totalBookings,
+        completedBookings: completed,
+        earnings,
+      })
+
+    } catch (err) {
+      console.error(err)
+      res.status(500).json({ message: "Stats fetch failed" })
+    }
   }
 )
 

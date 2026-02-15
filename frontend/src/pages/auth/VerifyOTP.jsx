@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import API from "@/api/api"
+import useAuth from "@/hooks/useAuth"
 
 export default function VerifyOTP() {
   const navigate = useNavigate()
@@ -12,19 +13,38 @@ export default function VerifyOTP() {
 
   const email = location.state?.email
   const [otp, setOtp] = useState("")
+  const { login } = useAuth()
+
+  // const handleVerify = async (e) => {
+  //   e.preventDefault()
+
+  //   const res = await API.post("/auth/verify-otp", {
+  //     email,
+  //     otp,
+  //   })
+
+  //   localStorage.setItem("token", res.data.token)
+
+  //   navigate("/services")
+  // }
 
   const handleVerify = async (e) => {
-    e.preventDefault()
+  e.preventDefault()
 
+  try {
     const res = await API.post("/auth/verify-otp", {
       email,
       otp,
     })
 
-    localStorage.setItem("token", res.data.token)
+    login(res.data.user, res.data.token)
 
-    navigate("/services")
+    navigate("/")
+  } catch (error) {
+    console.log(error.response?.data)
   }
+}
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

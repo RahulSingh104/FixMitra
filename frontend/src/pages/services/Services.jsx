@@ -70,9 +70,6 @@
 //   )
 // }
 
-
-
-
 // import { useEffect, useState } from "react"
 // import { Card, CardContent } from "@/components/ui/card"
 // import { Button } from "@/components/ui/button"
@@ -222,63 +219,62 @@
 //   )
 // }
 
-
-import { useEffect, useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { useNavigate } from "react-router-dom"
-import API from "@/api/api"
+import { useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
+import API from "@/api/api";
 
 export default function Services() {
-  const [services, setServices] = useState([])
-  const [categories, setCategories] = useState([])
-  const [search, setSearch] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("")
-  const [loading, setLoading] = useState(true)
+  const [services, setServices] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const servicesRes = await API.get("/services")
-        setServices(servicesRes.data)
+        const servicesRes = await API.get("/services");
+        setServices(servicesRes.data);
 
-        const categoryRes = await API.get("/services/category")
-        setCategories(categoryRes.data)
+        const categoryRes = await API.get("/services/category");
+        setCategories(categoryRes.data);
       } catch (error) {
-        console.error("Fetch error", error)
+        console.error("Fetch error", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   const filteredServices = services
     .filter((service) =>
-      service.title.toLowerCase().includes(search.toLowerCase())
+      service.title.toLowerCase().includes(search.toLowerCase()),
     )
     .filter((service) =>
-      selectedCategory
-        ? service.categoryId === selectedCategory
-        : true
-    )
+  selectedCategory
+    ? service.categoryId === Number(selectedCategory)
+    : true,
+);
+
 
   if (loading) {
     return (
       <div className="h-screen flex justify-center items-center">
         <p className="text-gray-500">Loading services...</p>
       </div>
-    )
+    );
   }
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
-
       {/* ===== Header Section ===== */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
         <div>
@@ -313,16 +309,20 @@ export default function Services() {
 
       {/* ===== Empty State ===== */}
       {filteredServices.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-32 text-center">
-          <div className="text-6xl mb-4">🚀</div>
-          <h2 className="text-2xl font-semibold mb-2">
-            No services found
-          </h2>
-          <p className="text-gray-500 mb-6">
-            Try adjusting your search or category filter.
+        <div className="flex flex-col items-center justify-center h-[70vh] text-center space-y-4">
+          <div className="text-5xl">🔍</div>
+          <h2 className="text-2xl font-semibold">No Services Found</h2>
+          <p className="text-muted-foreground">
+            Try adjusting your search or check back later.
           </p>
-          <Button onClick={() => navigate("/")}>
-            Go Back Home
+          <Button
+            variant="outline"
+            onClick={() => {
+              setSearch("");
+              setSelectedCategory("");
+            }}
+          >
+            Reset Filters
           </Button>
         </div>
       ) : (
@@ -331,18 +331,12 @@ export default function Services() {
             <Card
               key={service.id}
               className="rounded-2xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
-              onClick={() =>
-                navigate(`/services/${service.id}`)
-              }
+              onClick={() => navigate(`/services/${service.id}`)}
             >
               <CardContent className="p-6 space-y-4">
-                <Badge variant="secondary">
-                  {service.category?.name}
-                </Badge>
+                <Badge variant="secondary">{service.category?.name}</Badge>
 
-                <h3 className="text-xl font-semibold">
-                  {service.title}
-                </h3>
+                <h3 className="text-xl font-semibold">{service.title}</h3>
 
                 <p className="text-gray-500 line-clamp-2">
                   {service.description}
@@ -353,9 +347,7 @@ export default function Services() {
                     ₹{service.price}
                   </span>
 
-                  <Button size="sm">
-                    View
-                  </Button>
+                  <Button size="sm">View</Button>
                 </div>
               </CardContent>
             </Card>
@@ -363,5 +355,5 @@ export default function Services() {
         </div>
       )}
     </div>
-  )
+  );
 }

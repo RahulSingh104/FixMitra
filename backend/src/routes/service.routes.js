@@ -32,22 +32,31 @@ router.post(
   protect,
   authorize("PROVIDER"),
   async (req, res) => {
-    const { title, description, price, location, categoryId } = req.body;
+    try {
+      const { title, description, price, location, categoryId, image } = req.body;
 
-    const service = await prisma.service.create({
-      data: {
-        title,
-        description,
-        price,
-        location,
-        providerId: req.user.id,
-        categoryId,
-      },
-    });
+      const service = await prisma.service.create({
+        data: {
+          title,
+          description,
+          price: parseFloat(price),
+          location,
+          categoryId,   // remove Number if String
+          providerId: req.user.id,
+          image,
+        },
+      });
 
-    res.json(service);
+      res.json(service);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Service creation failed" });
+    }
   }
 );
+
+
+
 
 // Get All Services (Public)
 router.get("/", async (req, res) => {
@@ -62,6 +71,19 @@ router.get("/", async (req, res) => {
 
   res.json(services);
 });
+
+// Get Provider's Services
+router.get(
+  "/provider",
+  protect,
+  authorize("PROVIDER"),
+  async (req, res) => {
+    const services = await prisma.service.findMany({
+      where: { providerId: req.user.id },
+    })
+    res.json(services)
+  }
+)
 
 // Get single service
 router.get("/:id", async (req, res) => {
@@ -79,18 +101,7 @@ router.get("/:id", async (req, res) => {
   res.json(service);
 });
 
-// Get Provider's Services
-router.get(
-  "/provider",
-  protect,
-  authorize("PROVIDER"),
-  async (req, res) => {
-    const services = await prisma.service.findMany({
-      where: { providerId: req.user.id },
-    })
-    res.json(services)
-  }
-)
+
 
 
 module.exports = router;

@@ -5,6 +5,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import API from "@/api/api"
+import useAuth from "@/hooks/useAuth"
+
+
 
 export default function Login() {
   const navigate = useNavigate()
@@ -14,16 +17,18 @@ export default function Login() {
     password: "",
   })
 
-  const handleLogin = async (e) => {
-    e.preventDefault()
+  const { login } = useAuth()
 
-    const res = await API.post("/auth/login", form)
+const handleLogin = async (e) => {
+  e.preventDefault()
 
-    localStorage.setItem("token", res.data.token)
-    localStorage.setItem("user", JSON.stringify(res.data.user))
+  const res = await API.post("/auth/login", form)
 
-    navigate("/services")
-  }
+  login(res.data.user, res.data.token)
+
+  navigate("/")
+}
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

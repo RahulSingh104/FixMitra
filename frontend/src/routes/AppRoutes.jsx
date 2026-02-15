@@ -16,6 +16,7 @@ import Home from "@/pages/Home";
 
 import PaymentPage from "@/pages/payment/PaymentPage";
 import ProviderDashboard from "@/pages/provider/ProviderDashboard";
+import NotFound from "@/pages/NotFound"
 
 export default function AppRoutes() {
   return (
@@ -26,6 +27,7 @@ export default function AppRoutes() {
       <Route path="/register" element={<Register />} />
       <Route path="/verify" element={<VerifyOTP />} />
       <Route path="/services/:id" element={<ServiceDetail />} />
+      <Route path="*" element={<NotFound />} />
 
       <Route
         path="/bookings"
@@ -91,17 +93,9 @@ export default function AppRoutes() {
       />
       <Route path="/payment/:bookingId" element={<PaymentPage />} />
       <Route
-        path="/provider/add-service"
-        element={
-          <ProtectedRoute allowedRoles={["PROVIDER"]}>
-            <AddService />
-          </ProtectedRoute>
-        }
-      />
-      <Route
         path="/provider/dashboard"
         element={
-          <ProtectedRoute role="PROVIDER">
+          <ProtectedRoute allowedRoles={["PROVIDER"]}>
             <ProviderDashboard />
           </ProtectedRoute>
         }
