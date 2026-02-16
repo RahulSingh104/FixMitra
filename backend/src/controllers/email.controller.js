@@ -1,5 +1,5 @@
 
-const prisma = require("../prisma/client");
+
 const transporter = require("../config/mail");
 const { verifyEmailTemplate } = require("../utils/emailTemplate");
 

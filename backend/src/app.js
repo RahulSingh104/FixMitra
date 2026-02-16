@@ -9,6 +9,10 @@ const bookingRoutes = require("./routes/booking.routes");
 const reviewRoutes = require("./routes/review.routes");
 const paymentRoutes = require("./routes/payment.routes");
 const adminRoutes = require("./routes/admin.routes")
+const connectDB = require("./config/db")
+
+connectDB()
+
 
 const app = express();
 

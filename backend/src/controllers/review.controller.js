@@ -1,4 +1,4 @@
-const prisma = require("../prisma/client");
+
 
 exports.createReview = async (req, res) => {
   const { serviceId, rating, comment } = req.body;

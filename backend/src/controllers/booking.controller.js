@@ -1,4 +1,4 @@
-const prisma = require("../prisma/client");
+
 
 exports.createBooking = async (req, res) => {
   const { serviceId, address, scheduledAt } = req.body;

@@ -16,11 +16,23 @@ export default function AddService() {
   const [image, setImage] = useState("") 
   const [loading, setLoading] = useState(false)
 
+  // useEffect(() => {
+  //   API.get("/services/category")
+  //     .then((res) => setCategories(res.data))
+  //     .catch((err) => console.error(err))
+  // }, [])
+
   useEffect(() => {
-    API.get("/services/category")
-      .then((res) => setCategories(res.data))
-      .catch((err) => console.error(err))
-  }, [])
+  API.get("/services/category")
+    .then((res) => {
+      console.log("Categories API Response:", res.data)
+      setCategories(res.data)
+    })
+    .catch((err) => {
+      console.error("Category fetch error:", err.response?.data || err.message)
+    })
+}, [])
+
 
   const handleSubmit = async (e) => {
     e.preventDefault()

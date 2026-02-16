@@ -25,17 +25,19 @@ import useUser from "@/hooks/useUser"
 
 export default function ProtectedRoute({ children, allowedRoles }) {
   const token = localStorage.getItem("token")
-  const user = useUser()
+  const  {user} = useUser()
+
+  console.log("ProtectedRoute user:", user)
+
 
   if (!token || !user) {
     return <Navigate to="/login" />
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
+    console.log("Role not allowed:", user.role)
     return <Navigate to="/" />
   }
-  
-  console.log("ProtectedRoute check:", user?.role)
 
   return children
 }
