@@ -30,6 +30,8 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminRoutes)
+app.use("/api/reports", require("./routes/report.routes"))
+
 
 
 

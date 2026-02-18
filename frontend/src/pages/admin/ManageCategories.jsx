@@ -42,7 +42,7 @@ export default function ManageCategories() {
       </div>
 
       {categories.map((cat) => (
-        <Card key={cat.id}>
+        <Card key={cat._id}>
           <CardContent className="p-4">
             {cat.name}
           </CardContent>

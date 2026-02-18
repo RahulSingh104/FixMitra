@@ -113,8 +113,202 @@
 //   )
 // }
 
+// import { useEffect, useState } from "react";
+// import { useParams } from "react-router-dom";
+// import { Card, CardContent } from "@/components/ui/card";
+// import { Button } from "@/components/ui/button";
+// import { Badge } from "@/components/ui/badge";
+// import { Star } from "lucide-react";
+// import BookingModal from "@/components/booking/BookingModal";
+// import API from "@/api/api";
+// import useUser from "@/hooks/useUser";
+// import StarRating from "@/components/ui/StarRating";
+// import { useNavigate } from "react-router-dom";
+
+// export default function ServiceDetail() {
+//   const { id } = useParams();
+//   const { user } = useUser();
+
+//   const [service, setService] = useState(null);
+//   const [reviews, setReviews] = useState([]);
+//   const [loading, setLoading] = useState(true);
+
+//   const [rating, setRating] = useState(0);
+//   const [comment, setComment] = useState("");
+//   const [selectedImage, setSelectedImage] = useState(null);
+//     const navigate = useNavigate();
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         const serviceRes = await API.get(`/services/${id}`);
+//         setService(serviceRes.data);
+
+//         setSelectedImage(serviceRes.data.image);
+
+//         const reviewRes = await API.get(`/reviews/${id}`);
+//         setReviews(reviewRes.data);
+//       } catch (err) {
+//         console.error("Error loading service", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchData();
+//   }, [id]);
+
+//   const submitReview = async () => {
+//     if (!rating) return;
+
+//     try {
+//       await API.post("/reviews", {
+//         serviceId: id,
+//         rating,
+//         comment,
+//       });
+
+//       const reviewRes = await API.get(`/reviews/${id}`);
+//       setReviews(reviewRes.data);
+
+//       setRating(0);
+//       setComment("");
+//     } catch (err) {
+//       console.error("Review failed", err);
+//     }
+//   };
+
+//   if (loading) return null;
+//   if (!service) return <div>Service not found</div>;
+
+//   const avgRating =
+//     reviews.length > 0
+//       ? (reviews.reduce((a, b) => a + b.rating, 0) / reviews.length).toFixed(1)
+//       : 0;
+
+//   return (
+//     <div className="max-w-6xl mx-auto px-6 py-12 grid md:grid-cols-3 gap-12">
+//       {/* LEFT CONTENT */}
+//       <div className="md:col-span-2 space-y-8">
+//         {/* ================= IMAGE GALLERY ================= */}
+//         <div className="space-y-4">
+//           {/* Main Image */}
+//           <div className="rounded-2xl overflow-hidden shadow-md">
+//             <img
+//               src={
+//                 selectedImage ||
+//                 "https://images.unsplash.com/photo-1581578731548-c64695cc6952"
+//               }
+//               alt="Service"
+//               className="w-full h-96 object-cover"
+//             />
+//           </div>
+
+//           {/* Thumbnails */}
+//           <div className="flex gap-4">
+//             {[
+//               service.image,
+//               "https://images.unsplash.com/photo-1600585154526-990dced4db0d",
+//               "https://images.unsplash.com/photo-1598300053653-28d23d6b4a0e",
+//             ].map((img) => (
+//               <img
+//                 key={img}
+//                 src={img}
+//                 onClick={() => setSelectedImage(img)}
+//                 className={`w-24 h-20 object-cover rounded-lg cursor-pointer border-2 transition ${
+//                   selectedImage === img
+//                     ? "border-indigo-500"
+//                     : "border-transparent"
+//                 }`}
+//               />
+//             ))}
+//           </div>
+//         </div>
+
+//         {/* HEADER */}
+//         <div>
+//           <Badge className="mb-4">{service.category?.name}</Badge>
+
+//           <h1 className="text-4xl font-bold mb-4">{service.title}</h1>
+
+//           <div className="flex items-center gap-3 text-yellow-500">
+//             <Star size={18} fill="currentColor" />
+//             <span className="text-gray-700">
+//               {avgRating} ({reviews.length} reviews)
+//             </span>
+//           </div>
+//         </div>
+
+//         {/* DESCRIPTION */}
+//         <Card>
+//           <CardContent className="p-6">
+//             <h3 className="font-semibold mb-3">About this service</h3>
+//             <p className="text-gray-600">{service.description}</p>
+//           </CardContent>
+//         </Card>
+
+//         {/* REVIEW SECTION */}
+//         <Card>
+//           <CardContent className="p-6 space-y-6">
+//             <h3 className="text-xl font-semibold">Customer Reviews</h3>
+
+//             {/* Review Form */}
+//             {user && (
+//               <div className="space-y-4 border-b pb-6">
+//                 <StarRating rating={rating} setRating={setRating} />
+
+//                 <textarea
+//                   placeholder="Write your experience..."
+//                   className="w-full border rounded-lg p-3"
+//                   value={comment}
+//                   onChange={(e) => setComment(e.target.value)}
+//                 />
+
+//                 <Button onClick={submitReview}>Submit Review</Button>
+//               </div>
+//             )}
+
+//             {/* Review List */}
+//             {reviews.map((review) => (
+//               <div key={review._id} className="border-b pb-4">
+//                 <div className="flex items-center gap-2 text-yellow-500">
+//                   <Star size={14} fill="currentColor" />
+//                   <span>{review.rating}</span>
+//                 </div>
+
+//                 <p className="text-gray-600 mt-2">{review.comment}</p>
+
+//                 <p className="text-xs text-gray-400 mt-1">
+//                   {review.user?.name}
+//                 </p>
+//               </div>
+//             ))}
+//           </CardContent>
+//         </Card>
+//       </div>
+
+//       {/* RIGHT BOOKING */}
+//       <div className="sticky top-24 h-fit">
+//         <Card className="shadow-lg">
+//           <CardContent className="p-6 space-y-6">
+//             <div>
+//               <h2 className="text-3xl font-bold text-indigo-600">
+//                 ₹{service.price}
+//               </h2>
+//             </div>
+
+//             <BookingModal serviceId={service._id} />
+//           </CardContent>
+//         </Card>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -126,6 +320,7 @@ import StarRating from "@/components/ui/StarRating";
 
 export default function ServiceDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useUser();
 
   const [service, setService] = useState(null);
@@ -141,7 +336,6 @@ export default function ServiceDetail() {
       try {
         const serviceRes = await API.get(`/services/${id}`);
         setService(serviceRes.data);
-
         setSelectedImage(serviceRes.data.image);
 
         const reviewRes = await API.get(`/reviews/${id}`);
@@ -176,21 +370,40 @@ export default function ServiceDetail() {
     }
   };
 
+  /* ================= DELETE FUNCTION ================= */
+
+  const handleDelete = async () => {
+    try {
+      await API.delete(`/services/${service._id}`);
+      alert("Service deleted successfully");
+      navigate("/services");
+    } catch (err) {
+      console.error("Delete failed", err);
+      alert("Delete failed");
+    }
+  };
+
+  /* =================================================== */
+
   if (loading) return null;
   if (!service) return <div>Service not found</div>;
 
   const avgRating =
     reviews.length > 0
-      ? (reviews.reduce((a, b) => a + b.rating, 0) / reviews.length).toFixed(1)
+      ? (
+          reviews.reduce((a, b) => a + b.rating, 0) /
+          reviews.length
+        ).toFixed(1)
       : 0;
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12 grid md:grid-cols-3 gap-12">
-      {/* LEFT CONTENT */}
+
+      {/* ================= LEFT CONTENT ================= */}
       <div className="md:col-span-2 space-y-8">
-        {/* ================= IMAGE GALLERY ================= */}
+
+        {/* IMAGE GALLERY */}
         <div className="space-y-4">
-          {/* Main Image */}
           <div className="rounded-2xl overflow-hidden shadow-md">
             <img
               src={
@@ -202,15 +415,14 @@ export default function ServiceDetail() {
             />
           </div>
 
-          {/* Thumbnails */}
           <div className="flex gap-4">
             {[
               service.image,
               "https://images.unsplash.com/photo-1600585154526-990dced4db0d",
               "https://images.unsplash.com/photo-1598300053653-28d23d6b4a0e",
-            ].map((img, index) => (
+            ].map((img) => (
               <img
-                key={index}
+                key={img}
                 src={img}
                 onClick={() => setSelectedImage(img)}
                 className={`w-24 h-20 object-cover rounded-lg cursor-pointer border-2 transition ${
@@ -225,9 +437,13 @@ export default function ServiceDetail() {
 
         {/* HEADER */}
         <div>
-          <Badge className="mb-4">{service.category?.name}</Badge>
+          <Badge className="mb-4">
+            {service.category?.name}
+          </Badge>
 
-          <h1 className="text-4xl font-bold mb-4">{service.title}</h1>
+          <h1 className="text-4xl font-bold mb-4">
+            {service.title}
+          </h1>
 
           <div className="flex items-center gap-3 text-yellow-500">
             <Star size={18} fill="currentColor" />
@@ -240,41 +456,54 @@ export default function ServiceDetail() {
         {/* DESCRIPTION */}
         <Card>
           <CardContent className="p-6">
-            <h3 className="font-semibold mb-3">About this service</h3>
-            <p className="text-gray-600">{service.description}</p>
+            <h3 className="font-semibold mb-3">
+              About this service
+            </h3>
+            <p className="text-gray-600">
+              {service.description}
+            </p>
           </CardContent>
         </Card>
 
         {/* REVIEW SECTION */}
         <Card>
           <CardContent className="p-6 space-y-6">
-            <h3 className="text-xl font-semibold">Customer Reviews</h3>
+            <h3 className="text-xl font-semibold">
+              Customer Reviews
+            </h3>
 
-            {/* Review Form */}
             {user && (
               <div className="space-y-4 border-b pb-6">
-                <StarRating rating={rating} setRating={setRating} />
+                <StarRating
+                  rating={rating}
+                  setRating={setRating}
+                />
 
                 <textarea
                   placeholder="Write your experience..."
                   className="w-full border rounded-lg p-3"
                   value={comment}
-                  onChange={(e) => setComment(e.target.value)}
+                  onChange={(e) =>
+                    setComment(e.target.value)
+                  }
                 />
 
-                <Button onClick={submitReview}>Submit Review</Button>
+                <Button onClick={submitReview}>
+                  Submit Review
+                </Button>
               </div>
             )}
 
-            {/* Review List */}
             {reviews.map((review) => (
-              <div key={review.id} className="border-b pb-4">
+              <div key={review._id} className="border-b pb-4">
                 <div className="flex items-center gap-2 text-yellow-500">
                   <Star size={14} fill="currentColor" />
                   <span>{review.rating}</span>
                 </div>
 
-                <p className="text-gray-600 mt-2">{review.comment}</p>
+                <p className="text-gray-600 mt-2">
+                  {review.comment}
+                </p>
 
                 <p className="text-xs text-gray-400 mt-1">
                   {review.user?.name}
@@ -285,17 +514,31 @@ export default function ServiceDetail() {
         </Card>
       </div>
 
-      {/* RIGHT BOOKING */}
+      {/* ================= RIGHT BOOKING ================= */}
       <div className="sticky top-24 h-fit">
         <Card className="shadow-lg">
           <CardContent className="p-6 space-y-6">
+
             <div>
               <h2 className="text-3xl font-bold text-indigo-600">
                 ₹{service.price}
               </h2>
             </div>
 
-            <BookingModal serviceId={service.id} />
+            <BookingModal serviceId={service._id} />
+
+            {/* ===== DELETE BUTTON (OWNER ONLY) ===== */}
+            {user?.role === "PROVIDER" &&
+              user?._id === service.provider?._id && (
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  onClick={handleDelete}
+                >
+                  Delete Service
+                </Button>
+              )}
+
           </CardContent>
         </Card>
       </div>

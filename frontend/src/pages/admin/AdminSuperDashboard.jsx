@@ -76,6 +76,7 @@ const socket = io("http://localhost:5000")
 export default function AdminSuperDashboard() {
   const [stats, setStats] = useState(null)
   const [growth, setGrowth] = useState(0)
+    const [activeUsers, setActiveUsers] = useState(0)
 
   // ✅ Declare functions FIRST using useCallback
 
@@ -99,6 +100,15 @@ export default function AdminSuperDashboard() {
       console.error("Error fetching stats:", err)
     }
   }, [calculateGrowth])
+
+
+
+useEffect(() => {
+  socket.on("activeUsers", (count) => {
+    setActiveUsers(count)
+  })
+}, [])
+
 
   // ✅ Now useEffect AFTER function declaration
 
@@ -132,6 +142,8 @@ export default function AdminSuperDashboard() {
         <DashboardCard title="Total Users" value={stats.users} />
         <DashboardCard title="Total Services" value={stats.services} />
         <DashboardCard title="Total Bookings" value={stats.bookings} />
+        <DashboardCard title="Active Users" value={activeUsers} />
+
 
         <Card className="rounded-2xl shadow-lg">
           <CardContent className="p-6">

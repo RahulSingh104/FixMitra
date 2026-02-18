@@ -1,25 +1,26 @@
-
-
-const transporter = require("../config/mail");
-const { verifyEmailTemplate } = require("../utils/emailTemplate");
+const transporter = require("../config/mail")
+const EmailOTP = require("../models/EmailOTP")
+const { verifyEmailTemplate } = require("../utils/emailTemplate")
 
 exports.sendVerificationEmail = async (email) => {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otp = Math.floor(100000 + Math.random() * 900000).toString()
 
-  const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000)
 
-  await prisma.emailOTP.create({
-    data: {
-      email,
-      otp,
-      expiresAt,
-    },
-  });
+  // delete old OTP
+  await EmailOTP.deleteMany({ email })
+
+  // save new OTP
+  await EmailOTP.create({
+    email,
+    otp,
+    expiresAt,
+  })
 
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: email,
     subject: "Your OTP Code",
     html: verifyEmailTemplate(otp),
-  });
-};
+  })
+}

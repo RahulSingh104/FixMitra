@@ -17,6 +17,7 @@ import Home from "@/pages/Home";
 import PaymentPage from "@/pages/payment/PaymentPage";
 import ProviderDashboard from "@/pages/provider/ProviderDashboard";
 import NotFound from "@/pages/NotFound"
+import Categories from "@/pages/Categories";
 
 export default function AppRoutes() {
   return (
@@ -27,6 +28,7 @@ export default function AppRoutes() {
       <Route path="/register" element={<Register />} />
       <Route path="/verify" element={<VerifyOTP />} />
       <Route path="/services/:id" element={<ServiceDetail />} />
+      <Route path="/categories" element={<Categories />} />
       <Route path="*" element={<NotFound />} />
 
       <Route

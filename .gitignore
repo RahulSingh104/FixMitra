@@ -12,6 +12,7 @@ backend/node_modules/
 .env.*
 frontend/.env
 backend/.env
+createAdminMongo.js
 
 # ===============================
 # Logs

@@ -226,6 +226,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import API from "@/api/api";
+import { useLocation } from "react-router-dom";
 
 export default function Services() {
   const [services, setServices] = useState([]);
@@ -233,6 +234,7 @@ export default function Services() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   const navigate = useNavigate();
 
@@ -253,6 +255,15 @@ export default function Services() {
 
     fetchData();
   }, []);
+  useEffect(() => {
+  const params = new URLSearchParams(location.search)
+  const categoryFromURL = params.get("category")
+
+  if (categoryFromURL) {
+    setSelectedCategory(categoryFromURL)
+  }
+}, [location.search])
+
 
   const filteredServices = services
     .filter((service) =>
@@ -260,7 +271,7 @@ export default function Services() {
     )
     .filter((service) =>
   selectedCategory
-    ? service.categoryId === Number(selectedCategory)
+    ? service.category?._id === selectedCategory
     : true,
 );
 
@@ -299,7 +310,7 @@ export default function Services() {
           >
             <option value="">All Categories</option>
             {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
+              <option key={cat._id} value={cat._id}>
                 {cat.name}
               </option>
             ))}
@@ -329,9 +340,9 @@ export default function Services() {
         <div className="grid md:grid-cols-3 gap-8">
           {filteredServices.map((service) => (
             <Card
-              key={service.id}
+              key={service._id}
               className="rounded-2xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
-              onClick={() => navigate(`/services/${service.id}`)}
+              onClick={() => navigate(`/services/${service._id}`)}
             >
               <CardContent className="p-6 space-y-4">
                 <Badge variant="secondary">{service.category?.name}</Badge>

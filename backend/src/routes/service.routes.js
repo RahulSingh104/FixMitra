@@ -1,112 +1,3 @@
-// const router = require("express").Router();
-// const { protect, authorize } = require("../middleware/auth.middleware");
-// const prisma = require("../prisma/client");
-
-// // Create Category (Admin only)
-// router.post(
-//   "/category",
-//   protect,
-//   authorize("ADMIN"),
-//   async (req, res) => {
-//     const { name } = req.body;
-
-//     const category = await prisma.category.create({
-//       data: { name },
-//     });
-
-//     res.json(category);
-//   }
-// );
-
-// // Get All Categories
-// router.get("/category", async (req, res) => {
-//   const categories = await prisma.category.findMany();
-//   res.json(categories);
-// });
-
-
-
-// // Create Service (Provider only)
-// router.post(
-//   "/",
-//   protect,
-//   authorize("PROVIDER"),
-//   async (req, res) => {
-//     try {
-//       const { title, description, price, location, categoryId, image } = req.body;
-
-//       const service = await prisma.service.create({
-//         data: {
-//           title,
-//           description,
-//           price: parseFloat(price),
-//           location,
-//           categoryId,   // remove Number if String
-//           providerId: req.user.id,
-//           image,
-//         },
-//       });
-
-//       res.json(service);
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).json({ message: "Service creation failed" });
-//     }
-//   }
-// );
-
-
-
-
-// // Get All Services (Public)
-// router.get("/", async (req, res) => {
-//   const services = await prisma.service.findMany({
-//     include: {
-//       category: true,
-//       provider: {
-//         select: { name: true, email: true },
-//       },
-//     },
-//   });
-
-//   res.json(services);
-// });
-
-// // Get Provider's Services
-// router.get(
-//   "/provider",
-//   protect,
-//   authorize("PROVIDER"),
-//   async (req, res) => {
-//     const services = await prisma.service.findMany({
-//       where: { providerId: req.user.id },
-//     })
-//     res.json(services)
-//   }
-// )
-
-// // Get single service
-// router.get("/:id", async (req, res) => {
-//   const service = await prisma.service.findUnique({
-//     where: { id: req.params.id },
-//     include: {
-//       category: true,
-//       provider: {
-//         select: { name: true, email: true },
-//       },
-//       reviews: true,
-//     },
-//   });
-
-//   res.json(service);
-// });
-
-
-
-
-// module.exports = router;
-
-
 const router = require("express").Router()
 const { protect, authorize } = require("../middleware/auth.middleware")
 const Service = require("../models/Service")
@@ -128,9 +19,12 @@ router.get("/category", async (req, res) => {
   res.json(categories)
 })
 
-// Create Service (Provider)
+
 router.post("/", protect, authorize("PROVIDER"), async (req, res) => {
   try {
+    console.log("Incoming Data:", req.body)
+    console.log("User:", req.user)
+
     const service = await Service.create({
       title: req.body.title,
       description: req.body.description,
@@ -142,10 +36,13 @@ router.post("/", protect, authorize("PROVIDER"), async (req, res) => {
     })
 
     res.json(service)
+
   } catch (err) {
-    res.status(500).json({ message: "Service creation failed" })
+    console.error("CREATE SERVICE ERROR:", err)
+    res.status(500).json({ message: err.message })
   }
 })
+
 
 // Get All Services
 router.get("/", async (req, res) => {
@@ -156,14 +53,54 @@ router.get("/", async (req, res) => {
   res.json(services)
 })
 
-// Get Single Service
+
+// 🔥 Get Provider's Services (PUT ABOVE :id)
+router.get("/provider", protect, authorize("PROVIDER"), async (req, res) => {
+  const services = await Service.find({ provider: req.user._id })
+    .populate("category")
+
+  res.json(services)
+})
+
+
+// Get Single Service (ALWAYS KEEP THIS LAST)
 router.get("/:id", async (req, res) => {
   const service = await Service.findById(req.params.id)
     .populate("category")
     .populate("provider", "name email")
 
+  if (!service) {
+    return res.status(404).json({ message: "Service not found" })
+  }
+
   res.json(service)
 })
+
+
+// DELETE SERVICE (Provider Only)
+router.delete("/:id", protect, authorize("PROVIDER"), async (req, res) => {
+  try {
+    const service = await Service.findById(req.params.id)
+
+    if (!service) {
+      return res.status(404).json({ message: "Service not found" })
+    }
+
+    if (service.provider.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not authorized to delete this service" })
+    }
+
+    await service.deleteOne()
+
+    res.json({ message: "Service deleted successfully" })
+
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: "Service deletion failed" })
+  }
+})
+
+
 
 module.exports = router
 

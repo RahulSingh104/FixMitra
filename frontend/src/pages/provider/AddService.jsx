@@ -45,9 +45,7 @@ export default function AddService() {
         description,
         price: parseFloat(price),
         location,
-        categoryId,
-        latitude,
-        longitude,
+        categoryId: categoryId || null,   // remove Number 
         image,
       })
 
@@ -130,7 +128,7 @@ export default function AddService() {
             >
               <option value="">Select Category</option>
               {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
+                <option key={cat._id} value={cat._id}>
                   {cat.name}
                 </option>
               ))}

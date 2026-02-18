@@ -1,43 +1,8 @@
-// const router = require("express").Router();
-// const prisma = require("../prisma/client");
-// const { protect } = require("../middleware/auth.middleware");
-
-// // Create Review (USER)
-// router.post("/", protect, async (req, res) => {
-//   const { serviceId, rating, comment } = req.body;
-
-//   const review = await prisma.review.create({
-//     data: {
-//       userId: req.user.id,
-//       serviceId,
-//       rating,
-//       comment,
-//     },
-//   });
-
-//   res.json(review);
-// });
-
-// // Get Reviews for Service
-// router.get("/:serviceId", async (req, res) => {
-//   const reviews = await prisma.review.findMany({
-//     where: { serviceId: req.params.serviceId },
-//     include: {
-//       user: {
-//         select: { name: true },
-//       },
-//     },
-//   });
-
-//   res.json(reviews);
-// });
-
-// module.exports = router;
-
 const router = require("express").Router()
 const { protect } = require("../middleware/auth.middleware")
 const Review = require("../models/Review")
 const Service = require("../models/Service")
+const User = require("../models/User")
 
 // Create Review (USER)
 router.post("/", protect, async (req, res) => {
@@ -51,24 +16,35 @@ router.post("/", protect, async (req, res) => {
       comment,
     })
 
-    // 🔥 Update average rating
+    // 🔥 Calculate new average rating
     const reviews = await Review.find({ service: serviceId })
 
     const avg =
       reviews.reduce((acc, r) => acc + r.rating, 0) /
       reviews.length
 
-    await Service.findByIdAndUpdate(serviceId, {
-      averageRating: avg,
-    })
+    // 🔥 Update service average rating
+    const updatedService = await Service.findByIdAndUpdate(
+      serviceId,
+      { averageRating: avg },
+      { new: true }
+    )
+
+    // 🔥 AUTO BLOCK PROVIDER IF AVG < 2
+    if (avg < 2) {
+      await User.findByIdAndUpdate(updatedService.provider, {
+        isBlocked: true
+      })
+    }
 
     res.json(review)
 
   } catch (err) {
-    console.error(err)
+    console.error("Review creation failed:", err)
     res.status(500).json({ message: "Review creation failed" })
   }
 })
+
 
 // Get Reviews for Service
 router.get("/:serviceId", async (req, res) => {
