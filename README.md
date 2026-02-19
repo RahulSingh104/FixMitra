@@ -185,7 +185,7 @@ This project follows:
 
 
 git clone <repo-url>
-cd UrbanClap
+cd FixMitra
 
 
 ---
