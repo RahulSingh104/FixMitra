@@ -16,13 +16,19 @@ export default function Register() {
   })
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+  e.preventDefault()
 
-   try {
-    await API.post("/auth/register", form)
-    navigate("/verify", { state: { email: form.email } })
+  try {
+    const res = await API.post("/auth/register", form)
+
+    // ✅ IMPORTANT: use backend email (safe)
+    navigate("/verify", {
+      state: { email: res.data.email }
+    })
+
   } catch (error) {
-    console.log(error.response?.data)
+    console.log("REGISTER ERROR:", error.response?.data)
+    alert(error.response?.data?.message || "Registration failed")
   }
 }
 

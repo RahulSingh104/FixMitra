@@ -17,6 +17,8 @@ exports.sendVerificationEmail = async (email) => {
     expiresAt,
   })
 
+  console.log(`OTP for ${email}: ${otp}`)
+
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: email,

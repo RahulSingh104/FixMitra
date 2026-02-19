@@ -88,9 +88,9 @@ exports.verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
 
-    const record = await EmailOTP.findOne({ email, otp });
+    const record = await EmailOTP.findOne({ email }).sort({ createdAt: -1 });
 
-    if (!record) {
+    if (!record || record.otp !== otp) {
       return res.status(400).json({ message: "Invalid OTP" });
     }
 

@@ -2,49 +2,53 @@ import { useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import API from "@/api/api"
 import useAuth from "@/hooks/useAuth"
 
 export default function VerifyOTP() {
   const navigate = useNavigate()
-  const location = useLocation()
-
-  const email = location.state?.email
-  const [otp, setOtp] = useState("")
+  const { state } = useLocation()
   const { login } = useAuth()
 
-  // const handleVerify = async (e) => {
-  //   e.preventDefault()
+  const [otp, setOtp] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  //   const res = await API.post("/auth/verify-otp", {
-  //     email,
-  //     otp,
-  //   })
+  const email = state?.email
 
-  //   localStorage.setItem("token", res.data.token)
+  const handleVerify = async () => {
+    if (!otp) return alert("Enter OTP")
 
-  //   navigate("/services")
-  // }
+    try {
+      setLoading(true)
 
-  const handleVerify = async (e) => {
-  e.preventDefault()
+      const res = await API.post("/auth/verify-otp", {
+        email,
+        otp,
+      })
 
-  try {
-    const res = await API.post("/auth/verify-otp", {
-      email,
-      otp,
-    })
+      // ✅ Save login after OTP
+      login(res.data.user, res.data.token)
 
-    login(res.data.user, res.data.token)
+      alert("Verification successful 🚀")
 
-    navigate("/")
-  } catch (error) {
-    console.log(error.response?.data)
+      navigate("/")
+
+    } catch (err) {
+      console.log("OTP ERROR:", err.response?.data)
+      alert(err.response?.data?.message || "Invalid OTP")
+    } finally {
+      setLoading(false)
+    }
   }
-}
 
+  if (!email) {
+    return (
+      <div className="text-center mt-20">
+        <p>Email not found. Please register again.</p>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -53,18 +57,24 @@ export default function VerifyOTP() {
           <CardTitle>Verify OTP</CardTitle>
         </CardHeader>
 
-        <CardContent>
-          <form onSubmit={handleVerify} className="space-y-4">
-            <div>
-              <Label>Enter OTP</Label>
-              <Input
-                placeholder="123456"
-                onChange={(e) => setOtp(e.target.value)}
-              />
-            </div>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-gray-500">
+            OTP sent to <b>{email}</b>
+          </p>
 
-            <Button className="w-full">Verify</Button>
-          </form>
+          <Input
+            placeholder="Enter OTP"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+          />
+
+          <Button
+            className="w-full"
+            onClick={handleVerify}
+            disabled={loading}
+          >
+            {loading ? "Verifying..." : "Verify OTP"}
+          </Button>
         </CardContent>
       </Card>
     </div>
