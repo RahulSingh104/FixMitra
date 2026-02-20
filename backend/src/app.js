@@ -17,11 +17,24 @@ connectDB()
 const app = express();
 
 // Middlewares
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://fix-mitra-kappa.vercel.app"
+];
+
 app.use(
   cors({
-    origin: "*", // Later restrict to frontend domain
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed"));
+      }
+    },
+    credentials: true,
   })
 );
+
 app.use(express.json({ limit: "10mb" }));
 
 app.use("/api/test", testRoutes);
