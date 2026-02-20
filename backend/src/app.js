@@ -19,10 +19,17 @@ const app = express();
 // Middlewares
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: (origin, callback) => {
+      if (!origin || origin === process.env.FRONTEND_URL) {
+        callback(null, true)
+      } else {
+        callback(new Error("CORS not allowed"))
+      }
+    },
     credentials: true,
   })
-);
+)
+
 
 
 app.use(express.json({ limit: "10mb" }));

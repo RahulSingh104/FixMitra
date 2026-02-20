@@ -19,10 +19,17 @@ exports.sendVerificationEmail = async (email) => {
 
   console.log(`OTP for ${email}: ${otp}`)
 
+  try {
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: email,
     subject: "Your OTP Code",
     html: verifyEmailTemplate(otp),
   })
+
+  console.log("✅ Email sent successfully")
+} catch (err) {
+  console.error("❌ EMAIL ERROR:", err.message)
+}
+
 }
