@@ -10,9 +10,12 @@ const server = http.createServer(app);
 // 🔥 Attach Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: "*", // Later restrict to frontend domain
+    origin: process.env.FRONTEND_URL,
+    methods: ["GET", "POST"],
+    credentials: true,
   },
 });
+
 
 // 🔥 Active users counter
 let activeUsers = 0;

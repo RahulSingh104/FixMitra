@@ -71,7 +71,8 @@ import CountUp from "react-countup"
 import { TrendingUp, TrendingDown } from "lucide-react"
 import { io } from "socket.io-client"
 
-const socket = io("http://localhost:5000")
+const socket = io(import.meta.env.VITE_API_URL.replace("/api", ""))
+
 
 export default function AdminSuperDashboard() {
   const [stats, setStats] = useState(null)
