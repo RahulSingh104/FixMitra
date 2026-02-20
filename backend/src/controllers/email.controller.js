@@ -1,35 +1,38 @@
-const transporter = require("../config/mail")
+const { Resend } = require("resend")
 const EmailOTP = require("../models/EmailOTP")
-const { verifyEmailTemplate } = require("../utils/emailTemplate")
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 exports.sendVerificationEmail = async (email) => {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString()
-
-  const expiresAt = new Date(Date.now() + 10 * 60 * 1000)
-
-  // delete old OTP
-  await EmailOTP.deleteMany({ email })
-
-  // save new OTP
-  await EmailOTP.create({
-    email,
-    otp,
-    expiresAt,
-  })
-
-  console.log(`OTP for ${email}: ${otp}`)
-
   try {
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Your OTP Code",
-    html: verifyEmailTemplate(otp),
-  })
+    const otp = Math.floor(100000 + Math.random() * 900000).toString()
 
-  console.log("✅ Email sent successfully")
-} catch (err) {
-  console.error("❌ EMAIL ERROR:", err.message)
-}
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000)
 
+    await EmailOTP.deleteMany({ email })
+
+    await EmailOTP.create({
+      email,
+      otp,
+      expiresAt,
+    })
+
+    console.log(`OTP for ${email}: ${otp}`)
+
+    await resend.emails.send({
+      from: process.env.EMAIL_FROM,
+      to: email,
+      subject: "Your OTP Code",
+      html: `
+        <h2>Your OTP Code</h2>
+        <h1>${otp}</h1>
+        <p>This OTP is valid for 10 minutes.</p>
+      `,
+    })
+
+    console.log("✅ Email sent successfully")
+
+  } catch (err) {
+    console.error("❌ MAIL ERROR:", err)
+  }
 }
