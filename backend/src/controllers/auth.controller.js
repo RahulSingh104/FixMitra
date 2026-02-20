@@ -29,7 +29,10 @@ exports.register = async (req, res) => {
       isVerified: false,
     });
 
-    await sendVerificationEmail(email);
+    // send email async (non-blocking)
+    sendVerificationEmail(email).catch((err) =>
+      console.error("Email failed:", err),
+    );
 
     res.status(201).json({
       message: "OTP sent to email",

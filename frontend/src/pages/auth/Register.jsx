@@ -8,6 +8,7 @@ import API from "@/api/api"
 
 export default function Register() {
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
 
   const [form, setForm] = useState({
     name: "",
@@ -17,6 +18,10 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
   e.preventDefault()
+
+  if(loading) return 
+
+  setLoading(true)
 
   try {
     const res = await API.post("/auth/register", form)
@@ -29,6 +34,8 @@ export default function Register() {
   } catch (error) {
     console.log("REGISTER ERROR:", error.response?.data)
     alert(error.response?.data?.message || "Registration failed")
+  } finally {
+    setLoading(false)
   }
 }
 
@@ -73,7 +80,7 @@ export default function Register() {
               />
             </div>
 
-            <Button className="w-full">Register</Button>
+            <Button className="w-full" disabled={loading} > {loading ? "Registering..." : "Register"}</Button>
           </form>
         </CardContent>
       </Card>
