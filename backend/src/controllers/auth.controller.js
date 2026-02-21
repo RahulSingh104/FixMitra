@@ -26,18 +26,18 @@ exports.register = async (req, res) => {
       password: hashedPassword,
       provider: "EMAIL",
       role: "USER",
-      isVerified: false,
+      isVerified: false,  
     });
 
     // send email async (non-blocking)
-    sendVerificationEmail(email).catch((err) =>
-      console.error("Email failed:", err),
-    );
+   const otpRecord = await EmailOTP.findOne({email})
+   res.status(201).json({
+    massage:"OTP generated",
+    email,
+    otp:otpRecord?.otp,
 
-    res.status(201).json({
-      message: "OTP sent to email",
-      email,
-    });
+   })
+   
   } catch (error) {
     console.error("REGISTER ERROR:", error);
     res.status(500).json({ message: error.message });
@@ -55,11 +55,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    if (!user.isVerified) {
-      return res
-        .status(403)
-        .json({ message: "Please verify your email first" });
-    }
+    
 
     const isMatch = await comparePassword(password, user.password);
 

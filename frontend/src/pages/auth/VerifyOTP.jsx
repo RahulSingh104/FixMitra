@@ -58,8 +58,8 @@ export default function VerifyOTP() {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <p className="text-sm text-gray-500">
-            OTP sent to <b>{email}</b>
+          <p className="text-sm text-gray-500 text-center">
+            Demo OTP : {location.state?.otp}
           </p>
 
           <Input
