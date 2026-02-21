@@ -1,7 +1,6 @@
-const { Resend } = require("resend")
+const transporter = require("../config/mail")
 const EmailOTP = require("../models/EmailOTP")
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+const { verifyEmailTemplate } = require("../utils/emailTemplate")
 
 exports.sendVerificationEmail = async (email) => {
   try {
@@ -19,20 +18,16 @@ exports.sendVerificationEmail = async (email) => {
 
     console.log(`OTP for ${email}: ${otp}`)
 
-    await resend.emails.send({
-      from: process.env.EMAIL_FROM,
+    await transporter.sendMail({
+      from: `"FixMitra" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Your OTP Code",
-      html: `
-        <h2>Your OTP Code</h2>
-        <h1>${otp}</h1>
-        <p>This OTP is valid for 10 minutes.</p>
-      `,
+      html: verifyEmailTemplate(otp),
     })
 
     console.log("✅ Email sent successfully")
 
-  } catch (err) {
-    console.error("❌ MAIL ERROR:", err)
+  } catch (error) {
+    console.error("❌ MAIL ERROR:", error)
   }
 }
